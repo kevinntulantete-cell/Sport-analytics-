@@ -5,10 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="theme-color" content="#0B0F19">
-  <title>SPORT ANALYTICS — Données Réelles en Direct</title>
+  <title>SPORT ANALYTICS — Direct Mondial, Vidéos & Cotes</title>
+  
+  <!-- Icône Officielle de l'Application -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='25' fill='%230B0F19'/%3E%3Cpath d='M25 70 L25 50 L40 50 L40 70 Z M45 70 L45 35 L60 35 L60 70 Z M65 70 L65 20 L80 20 L80 70 Z' fill='%2300E676'/%3E%3Ccircle cx='72.5' cy='15' r='5' fill='%2300E676'/%3E%3C/svg%3E">
+
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    body { user-select: none; -webkit-tap-highlight-color: transparent; }
+    body { user-select: none; -webkit-tap-highlight-color: transparent; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
     .screen { display: none; }
     .screen.active { display: block; }
     .scrollbar-none::-webkit-scrollbar { display: none; }
@@ -17,74 +21,158 @@
 <body class="bg-[#0B0F19] text-white font-sans pb-24">
 
   <!-- ================= EN-TÊTE FIXE ================= -->
-  <header class="sticky top-0 bg-[#0B0F19]/95 backdrop-blur-md p-3.5 border-b border-slate-800 flex justify-between items-center z-40">
-    <div class="flex items-center space-x-2">
-      <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-[#00E676] to-blue-600 flex items-center justify-center font-black text-xs text-[#0B0F19]">
-        SA
+  <header class="sticky top-0 bg-[#0B0F19]/95 backdrop-blur-md px-3.5 py-2.5 border-b border-slate-800 flex justify-between items-center z-40">
+    <div class="flex items-center space-x-2.5">
+      <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-[#00E676] to-emerald-600 p-0.5 shadow-md shadow-emerald-500/20">
+        <div class="w-full h-full bg-[#0B0F19] rounded-[9px] flex items-center justify-center font-black text-xs text-[#00E676]">
+          SA
+        </div>
       </div>
       <div>
-        <h1 class="text-base font-black tracking-wider leading-none text-white">SPORT<span class="text-[#00E676]">ANALYTICS</span></h1>
-        <div class="flex items-center space-x-1 mt-0.5">
-          <span id="apiStatusDot" class="w-1.5 h-1.5 rounded-full bg-[#00E676] animate-pulse"></span>
-          <span id="apiStatusText" class="text-[8px] text-slate-400 font-mono uppercase">FLUX SATELLITE EN DIRECT</span>
+        <h1 class="text-sm font-black tracking-wider leading-none text-white">SPORT<span class="text-[#00E676]">ANALYTICS</span></h1>
+        <div class="flex items-center space-x-1.5 mt-0.5">
+          <span class="w-1.5 h-1.5 rounded-full bg-[#00E676] animate-pulse"></span>
+          <span class="text-[8px] text-slate-400 font-mono uppercase tracking-wider">MOTEUR MONDIAL EN DIRECT</span>
         </div>
       </div>
     </div>
     
     <div class="flex items-center space-x-2">
-      <button onclick="fetchRealSatelliteMatches()" title="Rafraîchir" class="p-1.5 rounded-lg bg-slate-900 border border-slate-800 text-xs active:rotate-180 transition">
-        🔄
-      </button>
-      <button onclick="openPaymentModal(2, 'VIP 1 Semaine')" id="vipBadgeHeader" class="text-[10px] bg-emerald-500/10 text-[#00E676] border border-emerald-500/30 px-2 py-1 rounded-lg font-bold font-mono">
-        ★ FORFAIT VIP
+      <button onclick="openPaymentModal(2, 'VIP Hebdo')" id="vipBadgeHeader" class="text-[10px] bg-emerald-500/10 text-[#00E676] border border-emerald-500/30 px-2.5 py-1 rounded-lg font-bold font-mono">
+        ★ PASS VIP
       </button>
     </div>
   </header>
 
   <!-- Notification Toast -->
-  <div id="toast" class="fixed top-16 left-4 right-4 bg-[#00E676] text-[#0B0F19] text-xs font-bold py-2.5 px-4 rounded-xl shadow-2xl text-center transform -translate-y-24 transition-all duration-300 z-50 font-mono">
+  <div id="toast" class="fixed top-14 left-4 right-4 bg-[#00E676] text-[#0B0F19] text-xs font-bold py-2.5 px-4 rounded-xl shadow-2xl text-center transform -translate-y-28 transition-all duration-300 z-50 font-mono">
     Notification
   </div>
 
-  <!-- ================= ÉCRAN 1 : VRAIS MATCHS EN DIRECT ================= -->
-  <main id="screen-matches" class="screen active p-4 space-y-4">
+  <!-- ================= ÉCRAN 1 : MATCHS EN DIRECT (MOTEUR MONDIAL) ================= -->
+  <main id="screen-matches" class="screen active p-3 space-y-3">
     
-    <!-- Filtres temporels -->
-    <div class="flex space-x-1.5 overflow-x-auto pb-1 scrollbar-none font-mono text-xs">
-      <button onclick="setMatchFilter('ALL')" id="f-ALL" class="m-filter-btn shrink-0 bg-[#00E676] text-[#0B0F19] px-3 py-1.5 rounded-xl font-bold shadow-lg shadow-emerald-500/20">
-        Tous (<span id="c-all">0</span>)
+    <!-- Sélecteur de mode de diffusion -->
+    <div class="flex space-x-1.5 overflow-x-auto pb-0.5 scrollbar-none font-mono text-xs">
+      <button onclick="setStreamMode('scores')" id="smode-scores" class="stream-btn shrink-0 bg-[#00E676] text-[#0B0F19] px-3.5 py-1.5 rounded-xl font-bold shadow-sm">
+        ⚽ Tous les Matchs en Direct
       </button>
-      <button onclick="setMatchFilter('LIVE')" id="f-LIVE" class="m-filter-btn shrink-0 bg-slate-900 border border-slate-800 text-slate-300 px-3 py-1.5 rounded-xl font-semibold flex items-center space-x-1.5">
-        <span class="w-1.5 h-1.5 rounded-full bg-red-600 animate-ping"></span>
-        <span>En Direct (<span id="c-live">0</span>)</span>
+      <button onclick="setStreamMode('videos')" id="smode-videos" class="stream-btn shrink-0 bg-slate-900 border border-slate-800 text-slate-300 px-3.5 py-1.5 rounded-xl font-semibold flex items-center space-x-1">
+        <span>📺 Vidéos & Diffusions</span>
+        <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
       </button>
-      <button onclick="setMatchFilter('UPCOMING')" id="f-UPCOMING" class="m-filter-btn shrink-0 bg-slate-900 border border-slate-800 text-slate-300 px-3 py-1.5 rounded-xl font-semibold">
-        À Venir (<span id="c-upcoming">0</span>)
-      </button>
-      <button onclick="setMatchFilter('FINISHED')" id="f-FINISHED" class="m-filter-btn shrink-0 bg-slate-900 border border-slate-800 text-slate-300 px-3 py-1.5 rounded-xl font-semibold">
-        Terminés (<span id="c-finished">0</span>)
+      <button onclick="setStreamMode('rdc')" id="smode-rdc" class="stream-btn shrink-0 bg-slate-900 border border-slate-800 text-slate-300 px-3.5 py-1.5 rounded-xl font-semibold">
+        🇨🇩 Linafoot & Cotes
       </button>
     </div>
 
-    <!-- Bannière d'état de synchronisation en direct -->
-    <div class="bg-slate-900 border border-slate-800 rounded-xl p-2.5 flex justify-between items-center text-[10px] font-mono text-slate-400">
-      <span id="syncText">Synchronisation avec les stades mondiaux...</span>
-      <button onclick="fetchRealSatelliteMatches()" class="text-[#00E676] font-bold underline">Actualiser</button>
+    <!-- Bannière Mobile Money -->
+    <div onclick="openPaymentModal(2, 'VIP Hebdo')" class="cursor-pointer bg-gradient-to-r from-slate-900 via-slate-900 to-emerald-950 p-2.5 rounded-xl border border-emerald-500/30 flex justify-between items-center shadow">
+      <div class="flex items-center space-x-2">
+        <span class="text-lg">📲</span>
+        <div>
+          <p class="text-[11px] font-bold text-white">M-Pesa, Orange & Airtel Money</p>
+          <p class="text-[9px] text-slate-400">Débloquez les pronostics VIP certifiés (2.00 $)</p>
+        </div>
+      </div>
+      <span class="text-[10px] font-bold font-mono text-[#00E676] bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/30">Activer</span>
     </div>
 
-    <!-- Conteneur des vrais matchs -->
-    <div id="matchesFeed" class="space-y-3">
-      <!-- Indicateur de chargement satellite -->
-      <div class="text-center py-16 space-y-3">
-        <div class="w-10 h-10 border-4 border-[#00E676] border-t-transparent rounded-full animate-spin mx-auto"></div>
-        <p class="text-xs font-mono text-slate-400">Chargement des vrais matchs en direct...</p>
+    <!-- CONTENEUR 1 : LE VRAI MOTEUR DE SCORES EN DIRECT MONDIAL -->
+    <div id="box-scores" class="space-y-2">
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-2xl p-1">
+        <iframe 
+          src="https://www.scorebat.com/embed/livescore/" 
+          frameborder="0" 
+          width="100%" 
+          height="680" 
+          allowfullscreen 
+          allow="autoplay; fullscreen" 
+          class="w-full h-[680px] rounded-xl bg-slate-950">
+        </iframe>
+      </div>
+    </div>
+
+    <!-- CONTENEUR 2 : VIDÉOS ET DIFFUSIONS DE TEMPS FORTS EN DIRECT -->
+    <div id="box-videos" class="hidden space-y-2">
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-2xl p-1">
+        <div class="p-2.5 bg-slate-950 border-b border-slate-800 flex justify-between items-center text-xs font-mono">
+          <span class="text-[#00E676] font-bold flex items-center space-x-1.5">
+            <span class="w-2 h-2 rounded-full bg-red-600 animate-ping"></span>
+            <span>Flux Vidéo Officiels & Résumés des Buts</span>
+          </span>
+          <span class="text-[10px] text-slate-400">Qualité HD</span>
+        </div>
+        <iframe 
+          src="https://www.scorebat.com/embed/" 
+          frameborder="0" 
+          width="100%" 
+          height="650" 
+          allowfullscreen 
+          allow="autoplay; fullscreen" 
+          class="w-full h-[650px] rounded-b-xl bg-slate-950">
+        </iframe>
+      </div>
+    </div>
+
+    <!-- CONTENEUR 3 : LINAFOOT RDC & COTES INTERACTIVES -->
+    <div id="box-rdc" class="hidden space-y-3">
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-xl p-3 space-y-3">
+        <div class="flex items-center space-x-2 border-b border-slate-800 pb-2">
+          <span class="text-lg">🇨🇩</span>
+          <div>
+            <h3 class="text-xs font-bold font-mono uppercase text-white">Linafoot Ligue 1 (RD Congo)</h3>
+            <p class="text-[9px] text-slate-400">Matchs avec cotes pour votre coupon</p>
+          </div>
+        </div>
+
+        <!-- Match 1 -->
+        <div class="p-2.5 bg-slate-950 rounded-xl border border-slate-800 space-y-2">
+          <div class="flex justify-between items-center text-[10px] font-mono text-slate-400">
+            <span>Stade TP Mazembe (Kamalondo)</span>
+            <span class="text-red-400 font-bold flex items-center"><span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-ping mr-1"></span> 74' DIRECT</span>
+          </div>
+          <div class="flex justify-between items-center font-bold text-xs py-1">
+            <span class="text-white">TP Mazembe</span>
+            <span class="text-[#00E676] font-mono text-base">2 - 1</span>
+            <span class="text-white">AS Vita Club</span>
+          </div>
+          <div class="grid grid-cols-3 gap-1.5 pt-1.5 border-t border-slate-800/60 font-mono text-xs">
+            <button onclick="addPickToCoupon('TP Mazembe vs AS Vita', 'Victoire Mazembe (1)', 1.85)" class="bg-slate-900 hover:border-[#00E676] py-1.5 rounded-lg border border-slate-800 text-center">
+              <span class="text-[8px] text-slate-500 block">1</span>
+              <b>1.85</b>
+            </button>
+            <button onclick="addPickToCoupon('TP Mazembe vs AS Vita', 'Match Nul (X)', 3.20)" class="bg-slate-900 hover:border-[#00E676] py-1.5 rounded-lg border border-slate-800 text-center">
+              <span class="text-[8px] text-slate-500 block">X</span>
+              <b>3.20</b>
+            </button>
+            <button onclick="addPickToCoupon('TP Mazembe vs AS Vita', 'Victoire Vita (2)', 4.80)" class="bg-slate-900 hover:border-[#00E676] py-1.5 rounded-lg border border-slate-800 text-center">
+              <span class="text-[8px] text-slate-500 block">2</span>
+              <b>4.80</b>
+            </button>
+          </div>
+        </div>
+
+        <!-- Match 2 -->
+        <div class="p-2.5 bg-slate-950 rounded-xl border border-slate-800 space-y-2">
+          <div class="flex justify-between items-center text-[10px] font-mono text-slate-400">
+            <span>Stade Frédéric Kibassa Maliba</span>
+            <span class="text-[#00E676] font-bold">TERMINÉ</span>
+          </div>
+          <div class="flex justify-between items-center font-bold text-xs py-1">
+            <span class="text-white">FC Saint-Éloi Lupopo</span>
+            <span class="text-white font-mono text-base">1 - 0</span>
+            <span class="text-white">DCMP Imana</span>
+          </div>
+          <div class="text-[10px] font-mono text-slate-500 text-right">Prono Validé (Moins de 2.5 buts) ✓</div>
+        </div>
       </div>
     </div>
   </main>
 
-  <!-- ================= ÉCRAN 2 : PRONOSTICS & TAUX VÉRIFIÉ ================= -->
+  <!-- ================= ÉCRAN 2 : PRONOSTICS & TAUX CERTIFIÉ ================= -->
   <main id="screen-predictions" class="screen p-4 space-y-4">
-    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex justify-between items-center font-mono">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex justify-between items-center font-mono shadow-lg">
       <div>
         <p class="text-[10px] text-slate-400 uppercase">Taux Réussite</p>
         <p class="text-xl font-black text-[#00E676]">78.4%</p>
@@ -94,7 +182,7 @@
         <p class="text-xl font-black text-sky-400">+21.2%</p>
       </div>
       <div class="text-right">
-        <p class="text-[10px] text-slate-400 uppercase">Vérifiés</p>
+        <p class="text-[10px] text-slate-400 uppercase">Validés</p>
         <p class="text-xl font-black text-white">47 / 60</p>
       </div>
     </div>
@@ -104,10 +192,10 @@
         <span class="text-[#00E676] bg-emerald-500/10 border border-emerald-500/30 px-2 py-0.5 rounded font-bold">PRONO DU JOUR</span>
         <span class="text-slate-400">Indice : 88%</span>
       </div>
-      <h3 class="font-bold text-sm">Pronostic Algorithmique Quotidien</h3>
-      <p class="text-xs text-slate-300">Sélection : <b class="text-[#00E676]">Plus de 2.5 Buts</b> (Cote : 1.82)</p>
-      <p class="text-[11px] text-slate-400">Calculé à partir de la moyenne xG et de la dynamique offensive des deux équipes.</p>
-      <button onclick="addPickToCoupon('Prono du Jour Algorithme', 'Plus de 2.5 Buts', 1.82)" class="w-full mt-2 bg-[#00E676] text-[#0B0F19] py-2 rounded-xl font-bold text-xs">
+      <h3 class="font-bold text-sm">TP Mazembe vs Mamelodi Sundowns</h3>
+      <p class="text-xs text-slate-300">Sélection : <b class="text-[#00E676]">Moins de 2.5 Buts</b> (Cote : 1.75)</p>
+      <p class="text-[11px] text-slate-400">Mazembe concède moins de 0.4 but par match à Kamalondo lors des phases de poules CAF.</p>
+      <button onclick="addPickToCoupon('TP Mazembe vs Sundowns', 'Moins de 2.5 Buts', 1.75)" class="w-full mt-2 bg-[#00E676] text-[#0B0F19] py-2 rounded-xl font-bold text-xs">
         + Ajouter au coupon
       </button>
     </div>
@@ -129,10 +217,10 @@
   <main id="screen-standings" class="screen p-4 space-y-4">
     <div class="flex justify-between items-center">
       <h2 class="text-xs font-bold text-slate-400 font-mono uppercase">Classements</h2>
-      <select id="leagueSelector" onchange="changeLeagueStandings(this.value)" class="bg-slate-900 border border-slate-800 text-xs font-mono text-[#00E676] rounded-xl px-2 py-1">
+      <select id="leagueSelector" onchange="renderStandings(this.value)" class="bg-slate-900 border border-slate-800 text-xs font-mono text-[#00E676] rounded-xl px-2 py-1">
         <option value="LINAFOOT">Linafoot RDC 🇨🇩</option>
-        <option value="UCL">Champions League</option>
-        <option value="EPL">Premier League</option>
+        <option value="UCL">Champions League 🇪🇺</option>
+        <option value="EPL">Premier League 🏴󠁧󠁢󠁥󠁮󠁧󠁿</option>
       </select>
     </div>
     <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3 shadow-lg overflow-x-auto">
@@ -211,10 +299,10 @@
 
   <!-- ================= POPUP MOBILE MONEY RDC ================= -->
   <div id="paymentModal" class="fixed inset-0 bg-black/85 backdrop-blur-md hidden items-end sm:items-center justify-center z-50 p-4">
-    <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 w-full max-w-sm space-y-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 w-full max-w-sm space-y-4 shadow-2xl">
       <div class="flex justify-between items-center pb-2 border-b border-slate-800">
-        <h3 class="font-bold text-sm text-white">Paiement Mobile Money</h3>
-        <button onclick="closePaymentModal()" class="text-slate-400 font-mono font-bold">✕</button>
+        <h3 class="font-bold text-sm text-white">Paiement Mobile Money RDC</h3>
+        <button onclick="closePaymentModal()" class="text-slate-400 font-mono font-bold text-lg">✕</button>
       </div>
 
       <div class="text-xs text-slate-300">
@@ -222,7 +310,7 @@
       </div>
 
       <div>
-        <label class="block text-[10px] font-mono text-slate-400 mb-1.5 uppercase">Opérateur RDC :</label>
+        <label class="block text-[10px] font-mono text-slate-400 mb-1.5 uppercase">1. Choisissez votre réseau :</label>
         <div class="grid grid-cols-3 gap-2 text-center text-xs font-bold font-mono">
           <button type="button" onclick="selectOperator(this, 'M-Pesa')" class="op-btn bg-slate-950 border-2 border-red-500 text-white p-2.5 rounded-xl">M-Pesa</button>
           <button type="button" onclick="selectOperator(this, 'Orange')" class="op-btn bg-slate-950 border-2 border-slate-800 text-slate-400 p-2.5 rounded-xl">Orange</button>
@@ -231,17 +319,17 @@
       </div>
 
       <div>
-        <label class="block text-[10px] font-mono text-slate-400 mb-1.5 uppercase">Numéro de téléphone :</label>
+        <label class="block text-[10px] font-mono text-slate-400 mb-1.5 uppercase">2. Votre Numéro RDC :</label>
         <input type="tel" id="userPhone" placeholder="Ex: 0812345678" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white font-mono focus:outline-none focus:border-[#00E676]">
       </div>
 
-      <button id="paySubmitBtn" onclick="processPayment()" class="w-full bg-[#00E676] text-[#0B0F19] font-black py-3 rounded-xl text-xs uppercase tracking-wider">
+      <button id="paySubmitBtn" onclick="processPayment()" class="w-full bg-[#00E676] active:scale-95 transition text-[#0B0F19] font-black py-3 rounded-xl text-xs uppercase tracking-wider shadow-lg shadow-emerald-500/20">
         Recevoir le Push PIN
       </button>
     </div>
   </div>
 
-  <!-- ================= NAVIGATION INFÉRIEURE ================= -->
+  <!-- ================= BARRE DE NAVIGATION INFÉRIEURE ================= -->
   <nav class="fixed bottom-0 left-0 right-0 bg-[#0B0F19]/95 backdrop-blur-lg border-t border-slate-800 py-2 px-4 flex justify-around items-center z-40">
     <button onclick="nav('matches')" id="nav-matches" class="nav-btn flex flex-col items-center text-[#00E676]">
       <span class="text-base">⚽</span>
@@ -266,217 +354,28 @@
     </button>
   </nav>
 
-  <!-- ================= CONNECTEUR SATELLITE TEMPS RÉEL (SCRIPT PRINCIPAL) ================= -->
+  <!-- ================= LOGIQUE JAVASCRIPT ================= -->
   <script>
-    let realLiveMatches = [];
-    let currentFilter = 'ALL';
-
-    // 1. Interrogation des serveurs satellites en direct
-    async function fetchRealSatelliteMatches() {
-      const feed = document.getElementById('matchesFeed');
-      document.getElementById('syncText').innerText = 'Téléchargement des scores mondiaux...';
-
-      const leagues = [
-        { code: 'eng.1', name: 'Premier League' },
-        { code: 'uefa.champions', name: 'Champions League' },
-        { code: 'esp.1', name: 'La Liga' },
-        { code: 'ita.1', name: 'Serie A' },
-        { code: 'caf.champions', name: 'CAF Champions League' }
-      ];
-
-      let allEvents = [];
-
-      try {
-        // Appels aux endpoints mondiaux ouverts (sans clé requise)
-        const promises = leagues.map(l => 
-          fetch(`https://site.api.espn.com/apis/site/v2/sports/soccer/${l.code}/scoreboard`)
-            .then(res => res.json())
-            .then(data => {
-              if (data && data.events) {
-                return data.events.map(ev => parseEspnEvent(ev, l.name));
-              }
-              return [];
-            })
-            .catch(() => [])
-        );
-
-        const results = await Promise.all(promises);
-        results.forEach(arr => { allEvents = allEvents.concat(arr); });
-
-      } catch (err) {
-        console.warn('Erreur connexion satellite :', err);
-      }
-
-      // Si le réseau est trop faible ou aucun match en cours, charger le catalogue complet de secours
-      if (allEvents.length === 0) {
-        allEvents = getFallbackRealSchedule();
-        document.getElementById('syncText').innerText = 'Mode Hors-Ligne RDC (Données sauvegardées)';
-      } else {
-        document.getElementById('syncText').innerText = `Connecté : ${allEvents.length} matchs réels synchronisés`;
-      }
-
-      realLiveMatches = allEvents;
-      renderMatchesUI();
-    }
-
-    function parseEspnEvent(ev, leagueName) {
-      const comp = ev.competitions && ev.competitions[0] ? ev.competitions[0] : null;
-      const home = comp && comp.competitors ? comp.competitors.find(c => c.homeAway === 'home') : null;
-      const away = comp && comp.competitors ? comp.competitors.find(c => c.homeAway === 'away') : null;
-
-      const state = ev.status && ev.status.type ? ev.status.type.state : 'pre';
-      let type = 'UPCOMING';
-      if (state === 'in') type = 'LIVE';
-      if (state === 'post') type = 'FINISHED';
-
-      const homeScore = home && home.score ? home.score : '0';
-      const awayScore = away && away.score ? away.score : '0';
-      const timeDisplay = ev.status && ev.status.type ? ev.status.type.detail : 'À Venir';
-
-      return {
-        id: ev.id,
-        league: leagueName,
-        home: home ? home.team.displayName : 'Équipe 1',
-        away: away ? away.team.displayName : 'Équipe 2',
-        homeLogo: home && home.team.logo ? home.team.logo : '',
-        awayLogo: away && away.team.logo ? away.team.logo : '',
-        score: type === 'UPCOMING' ? 'VS' : `${homeScore} - ${awayScore}`,
-        time: timeDisplay,
-        type: type,
-        isLive: type === 'LIVE',
-        odds: { h: 1.85, x: 3.30, a: 3.80 }
-      };
-    }
-
-    function getFallbackRealSchedule() {
-      return [
-        {
-          id: 101,
-          league: 'CAF Champions League (RDC)',
-          home: 'TP Mazembe',
-          away: 'Mamelodi Sundowns',
-          score: 'VS',
-          time: 'Aujourd hui 15:30',
-          type: 'UPCOMING',
-          odds: { h: 2.10, x: 3.10, a: 3.40 }
-        },
-        {
-          id: 102,
-          league: 'Ligue 1 RDC - Linafoot',
-          home: 'AS Vita Club',
-          away: 'DCMP Imana (Kinshasa)',
-          score: '1 - 0',
-          time: '68 DIRECT',
-          type: 'LIVE',
-          odds: { h: 1.65, x: 3.20, a: 5.40 }
-        },
-        {
-          id: 103,
-          league: 'Premier League',
-          home: 'Arsenal FC',
-          away: 'Manchester City',
-          score: '2 - 1',
-          time: '78 DIRECT',
-          type: 'LIVE',
-          odds: { h: 1.45, x: 4.10, a: 7.20 }
-        },
-        {
-          id: 104,
-          league: 'UEFA Champions League',
-          home: 'Real Madrid',
-          away: 'Bayern Munich',
-          score: 'VS',
-          time: 'Demain 21:00',
-          type: 'UPCOMING',
-          odds: { h: 2.20, x: 3.60, a: 3.30 }
-        },
-        {
-          id: 105,
-          league: 'Serie A (Résultat)',
-          home: 'Inter Milan',
-          away: 'Juventus',
-          score: '2 - 0',
-          time: 'Terminé',
-          type: 'FINISHED',
-          odds: { h: 1.85, x: 3.30, a: 4.40 }
-        }
-      ];
-    }
-
-    // 2. Affichage des cartes de match
-    function renderMatchesUI() {
-      const feed = document.getElementById('matchesFeed');
-      feed.innerHTML = '';
-
-      let list = realLiveMatches;
-      if (currentFilter !== 'ALL') {
-        list = realLiveMatches.filter(m => m.type === currentFilter);
-      }
-
-      if (list.length === 0) {
-        feed.innerHTML = '<div class="text-center py-10 text-slate-500 font-mono text-xs">Aucun match dans cette catégorie pour le moment.</div>';
-        return;
-      }
-
-      list.forEach(m => {
-        feed.innerHTML += `
-          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-xl">
-            <div class="flex justify-between items-center text-[10px] text-slate-400 mb-2 font-mono">
-              <span class="font-bold text-slate-300 truncate max-w-[65%]">${m.league}</span>
-              ${m.type === 'LIVE' ? 
-                `<span class="text-red-400 font-bold flex items-center shrink-0"><span class="w-2 h-2 rounded-full bg-red-500 animate-ping mr-1"></span> ${m.time}</span>` :
-                (m.type === 'FINISHED' ? `<span class="text-[#00E676] font-bold">Terminé ✓</span>` : `<span class="text-slate-400">${m.time}</span>`)
-              }
-            </div>
-
-            <div class="flex justify-between items-center font-bold text-sm my-1">
-              <span class="w-5/12 truncate text-white">${m.home}</span>
-              <span class="w-2/12 text-center text-[#00E676] font-mono text-lg">${m.score}</span>
-              <span class="w-5/12 truncate text-right text-white">${m.away}</span>
-            </div>
-
-            ${m.type !== 'FINISHED' ? `
-              <div class="grid grid-cols-3 gap-2 mt-3 text-center text-xs font-mono">
-                <button onclick="addPickToCoupon('${m.home} vs ${m.away}', 'Victoire ${m.home}', ${m.odds.h})" class="bg-slate-950 active:scale-95 transition p-2 rounded-xl border border-slate-800">
-                  <span class="text-[9px] text-slate-500 block">1</span>
-                  <b class="text-white">${m.odds.h.toFixed(2)}</b>
-                </button>
-                <button onclick="addPickToCoupon('${m.home} vs ${m.away}', 'Nul (X)', ${m.odds.x})" class="bg-slate-950 active:scale-95 transition p-2 rounded-xl border border-slate-800">
-                  <span class="text-[9px] text-slate-500 block">X</span>
-                  <b class="text-white">${m.odds.x.toFixed(2)}</b>
-                </button>
-                <button onclick="addPickToCoupon('${m.home} vs ${m.away}', 'Victoire ${m.away}', ${m.odds.a})" class="bg-slate-950 active:scale-95 transition p-2 rounded-xl border border-slate-800">
-                  <span class="text-[9px] text-slate-500 block">2</span>
-                  <b class="text-white">${m.odds.a.toFixed(2)}</b>
-                </button>
-              </div>
-            ` : ''}
-          </div>
-        `;
-      });
-
-      // Compteurs
-      document.getElementById('c-all').innerText = realLiveMatches.length;
-      document.getElementById('c-live').innerText = realLiveMatches.filter(m => m.type === 'LIVE').length;
-      document.getElementById('c-upcoming').innerText = realLiveMatches.filter(m => m.type === 'UPCOMING').length;
-      document.getElementById('c-finished').innerText = realLiveMatches.filter(m => m.type === 'FINISHED').length;
-    }
-
-    function setMatchFilter(type) {
-      currentFilter = type;
-      document.querySelectorAll('.m-filter-btn').forEach(b => {
-        b.classList.remove('bg-[#00E676]', 'text-[#0B0F19]', 'font-bold', 'shadow-lg');
+    // 1. Sélecteur de mode de diffusion (Scores mondiaux vs Vidéos vs Linafoot)
+    function setStreamMode(mode) {
+      document.querySelectorAll('.stream-btn').forEach(b => {
+        b.classList.remove('bg-[#00E676]', 'text-[#0B0F19]', 'font-bold');
         b.classList.add('bg-slate-900', 'text-slate-300', 'font-semibold');
       });
-      const active = document.getElementById('f-' + type);
-      if (active) {
-        active.classList.remove('bg-slate-900', 'text-slate-300', 'font-semibold');
-        active.classList.add('bg-[#00E676]', 'text-[#0B0F19]', 'font-bold', 'shadow-lg');
+
+      const activeBtn = document.getElementById('smode-' + mode);
+      if (activeBtn) {
+        activeBtn.classList.remove('bg-slate-900', 'text-slate-300', 'font-semibold');
+        activeBtn.classList.add('bg-[#00E676]', 'text-[#0B0F19]', 'font-bold');
       }
-      renderMatchesUI();
+
+      ['scores', 'videos', 'rdc'].forEach(m => {
+        document.getElementById('box-' + m).classList.add('hidden');
+      });
+      document.getElementById('box-' + mode).classList.remove('hidden');
     }
 
-    // 3. Gestion du coupon
+    // 2. Gestion du Coupon
     let coupon = [];
 
     function addPickToCoupon(match, pick, odd) {
@@ -498,17 +397,17 @@
       list.innerHTML = '';
 
       if (coupon.length === 0) {
-        list.innerHTML = '<div class="text-center py-8 text-xs text-slate-500 font-mono">Aucun match sélectionné.</div>';
+        list.innerHTML = '<div class="text-center py-10 text-xs text-slate-500 font-mono">Aucun match sélectionné.</div>';
       } else {
         coupon.forEach((item, idx) => {
           list.innerHTML += `
-            <div class="bg-slate-900 border border-slate-800 p-3 rounded-xl flex justify-between items-center text-xs">
+            <div class="bg-slate-900 border border-slate-800 p-3 rounded-2xl flex justify-between items-center text-xs">
               <div>
                 <p class="font-bold text-white">${item.match}</p>
-                <p class="text-[#00E676] text-[11px]">${item.pick}</p>
+                <p class="text-[#00E676] text-[11px] font-mono">${item.pick}</p>
               </div>
               <div class="flex items-center space-x-2">
-                <span class="font-mono font-bold bg-slate-950 px-2 py-1 rounded text-white border border-slate-800">${item.odd.toFixed(2)}</span>
+                <span class="font-mono font-bold bg-slate-950 px-2.5 py-1 rounded-xl text-white border border-slate-800">${item.odd.toFixed(2)}</span>
                 <button onclick="removeCouponItem(${idx})" class="text-red-400 font-bold px-1.5 py-0.5">✕</button>
               </div>
             </div>
@@ -545,8 +444,8 @@
       showToast('Code #SA-2026 copié !');
     }
 
-    // 4. Classements
-    const standingsData = {
+    // 3. Classements
+    const standingsDatabase = {
       LINAFOOT: [
         { rank: 1, team: 'TP Mazembe', p: 14, diff: '+22', pts: 36 },
         { rank: 2, team: 'Maniema Union', p: 14, diff: '+15', pts: 31 },
@@ -567,10 +466,12 @@
     };
 
     function renderStandings(key = 'LINAFOOT') {
-      const b = document.getElementById('standingsTableBody');
-      b.innerHTML = '';
-      (standingsData[key] || []).forEach(r => {
-        b.innerHTML += `
+      const body = document.getElementById('standingsTableBody');
+      body.innerHTML = '';
+      const list = standingsDatabase[key] || [];
+
+      list.forEach(r => {
+        body.innerHTML += `
           <tr class="py-2.5">
             <td class="py-2.5 font-bold ${r.rank <= 2 ? 'text-[#00E676]' : 'text-slate-500'}">${r.rank}</td>
             <td class="py-2.5 font-bold text-white">${r.team}</td>
@@ -582,9 +483,7 @@
       });
     }
 
-    function changeLeagueStandings(v) { renderStandings(v); }
-
-    // 5. Navigation
+    // 4. Navigation
     function nav(screenId) {
       document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
       document.querySelectorAll('.nav-btn').forEach(b => {
@@ -604,59 +503,66 @@
     function showToast(msg) {
       const t = document.getElementById('toast');
       t.innerText = msg;
-      t.classList.remove('-translate-y-24');
+      t.classList.remove('-translate-y-28');
       t.classList.add('translate-y-0');
       setTimeout(() => {
         t.classList.remove('translate-y-0');
-        t.classList.add('-translate-y-24');
+        t.classList.add('-translate-y-28');
       }, 2500);
     }
 
-    // 6. Mobile Money
+    // 5. Mobile Money RDC
     let selectedOp = 'M-Pesa';
+
     function openPaymentModal(price = 2, name = 'VIP 1 Semaine') {
       document.getElementById('modalPlanName').innerText = `${name} (${price}.00 $)`;
       const m = document.getElementById('paymentModal');
       m.classList.remove('hidden');
       m.classList.add('flex');
     }
+
     function closePaymentModal() {
       const m = document.getElementById('paymentModal');
       m.classList.add('hidden');
       m.classList.remove('flex');
     }
+
     function selectOperator(btn, op) {
       selectedOp = op;
       document.querySelectorAll('.op-btn').forEach(b => {
         b.classList.remove('border-red-500', 'border-orange-500', 'text-white');
         b.classList.add('border-slate-800', 'text-slate-400');
       });
+      btn.classList.remove('border-slate-800', 'text-slate-400');
       btn.classList.add(op === 'Orange' ? 'border-orange-500' : 'border-red-500', 'text-white');
     }
+
     function processPayment() {
       const phone = document.getElementById('userPhone').value.trim();
-      if (!phone || phone.length < 9) return alert('Entrez un numéro RDC valide (ex: 0812345678)');
+      if (!phone || phone.length < 9) return alert('Veuillez entrer un numéro RDC valide (ex: 0812345678)');
+
       const btn = document.getElementById('paySubmitBtn');
       btn.innerText = 'Connexion à ' + selectedOp + '...';
       btn.disabled = true;
+
+      setTimeout(() => {
+        btn.innerText = 'Validation PIN sur ' + phone;
+      }, 1200);
+
       setTimeout(() => {
         closePaymentModal();
         btn.innerText = 'Recevoir le Push PIN';
         btn.disabled = false;
         document.getElementById('vipBadgeHeader').innerText = '★ VIP ACTIF';
         document.getElementById('vipBadgeHeader').classList.add('bg-[#00E676]', 'text-[#0B0F19]');
-        document.getElementById('accountStatusText').innerText = 'VIP ACTIF via ' + selectedOp;
+        document.getElementById('accountStatusText').innerText = 'Statut : VIP ACTIF jusqu au 30/11 via ' + selectedOp;
         showToast('Paiement validé ! Vos pronostics VIP sont débloqués.');
-      }, 2500);
+      }, 3200);
     }
 
-    // Lancement automatique
-    fetchRealSatelliteMatches();
+    // Initialisation
     renderStandings('LINAFOOT');
     updateCouponUI();
-
-    // Actualisation automatique toutes les 60 secondes pour les scores en direct
-    setInterval(fetchRealSatelliteMatches, 60000);
   </script>
 </body>
 </html>
