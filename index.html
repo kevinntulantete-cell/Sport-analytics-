@@ -7,41 +7,63 @@
   <meta name="theme-color" content="#0B0F19">
   <title>SPORT ANALYTICS</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <style>body { user-select: none; -webkit-tap-highlight-color: transparent; }</style>
+  <style>
+    body { user-select: none; -webkit-tap-highlight-color: transparent; }
+    .screen { display: none; }
+    .screen.active { display: block; }
+  </style>
 </head>
 <body class="bg-[#0B0F19] text-white font-sans pb-24">
 
-  <!-- En-tête Mobile -->
-  <header class="sticky top-0 bg-[#0B0F19] p-4 border-b border-slate-800 flex justify-between items-center z-50">
+  <!-- ================= EN-TÊTE FIXE ================= -->
+  <header class="sticky top-0 bg-[#0B0F19]/95 backdrop-blur-md p-4 border-b border-slate-800 flex justify-between items-center z-50">
     <div>
-      <h1 class="text-lg font-black tracking-wider">SPORT<span class="text-[#00E676]">ANALYTICS</span></h1>
-      <p class="text-[9px] text-slate-400 font-mono">IA & PRÉDICTIONS SPORTIVES</p>
+      <h1 class="text-lg font-black tracking-wider text-white">SPORT<span class="text-[#00E676]">ANALYTICS</span></h1>
+      <p class="text-[9px] text-slate-400 font-mono">IA & PREDICTIONS SPORTIVES</p>
     </div>
-    <span class="text-[10px] bg-emerald-500/20 text-[#00E676] px-2.5 py-1 rounded-lg font-bold font-mono">★ VIP ACTIF</span>
+    <button onclick="nav('account')" id="vipBadgeHeader" class="text-[10px] bg-emerald-500/20 text-[#00E676] border border-emerald-500/40 px-2.5 py-1 rounded-lg font-bold font-mono">
+      ★ DEVENIR VIP
+    </button>
   </header>
 
-  <div class="p-4 space-y-4">
-    <!-- Info Paiement RDC -->
-    <div class="bg-gradient-to-r from-slate-900 to-emerald-950 p-3 rounded-xl border border-emerald-500/30 text-xs">
-      <strong class="text-[#00E676]">RDC Mobile Money :</strong> M-Pesa, Orange Money, Airtel Money intégrés.
+  <!-- Notification Flottante Toast -->
+  <div id="toast" class="fixed top-16 left-4 right-4 bg-[#00E676] text-[#0B0F19] text-xs font-bold py-2.5 px-4 rounded-xl shadow-xl text-center transform -translate-y-20 transition-all duration-300 z-50">
+    Notification
+  </div>
+
+  <!-- ================= ÉCRAN 1 : MATCHS DU JOUR ================= -->
+  <main id="screen-matches" class="screen active p-4 space-y-4">
+    
+    <!-- Bannière Mobile Money -->
+    <div onclick="openPaymentModal()" class="cursor-pointer bg-gradient-to-r from-slate-900 to-emerald-950 p-3.5 rounded-2xl border border-emerald-500/30 flex justify-between items-center">
+      <div>
+        <p class="text-[11px] font-bold text-[#00E676]">Paiement Mobile Money RDC</p>
+        <p class="text-[10px] text-slate-300">Activez votre accès VIP avec M-Pesa, Orange ou Airtel.</p>
+      </div>
+      <span class="bg-[#00E676] text-[#0B0F19] text-[10px] font-bold px-2 py-1 rounded-lg">Payer</span>
     </div>
 
-    <!-- Match 1 : En direct -->
+    <h2 class="text-xs font-bold text-slate-400 font-mono uppercase tracking-wider">Matchs & Direct en cours</h2>
+
+    <!-- Match 1 -->
     <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-lg">
       <div class="flex justify-between text-[11px] text-slate-400 mb-2">
-        <span>Champions League</span>
-        <span class="text-red-400 font-bold">● 68' DIRECT</span>
+        <span class="font-semibold text-slate-300">UEFA Champions League</span>
+        <span class="text-red-400 font-bold flex items-center"><span class="w-2 h-2 rounded-full bg-red-500 animate-ping mr-1"></span> 68' DIRECT</span>
       </div>
-      <div class="flex justify-between items-center font-bold text-base">
-        <span>Arsenal</span>
+      
+      <div class="flex justify-between items-center font-bold text-base my-1">
+        <span>Arsenal FC</span>
         <span class="text-[#00E676] font-mono text-xl">2 - 1</span>
         <span>Man. City</span>
       </div>
+
+      <!-- Jauge de probabilité -->
       <div class="mt-3 pt-3 border-t border-slate-800">
         <div class="flex justify-between text-[10px] font-mono text-slate-400 mb-1">
-          <span class="text-[#00E676]">1: 62%</span>
-          <span>X: 24%</span>
-          <span class="text-sky-400">2: 14%</span>
+          <span class="text-[#00E676]">Arsenal: 62%</span>
+          <span>Nul: 24%</span>
+          <span class="text-sky-400">City: 14%</span>
         </div>
         <div class="w-full h-1.5 bg-slate-950 rounded-full flex overflow-hidden">
           <div style="width: 62%" class="bg-[#00E676]"></div>
@@ -49,46 +71,376 @@
           <div style="width: 14%" class="bg-sky-400"></div>
         </div>
       </div>
-      <div class="mt-3 flex justify-between items-center text-xs bg-slate-950 p-2.5 rounded-xl">
-        <span>Conseil : <b class="text-[#00E676]">+3.5 buts</b></span>
-        <button onclick="ajouterMatch()" class="bg-[#00E676] text-slate-950 px-3 py-1 rounded-lg font-bold">+ 1.88</button>
+
+      <!-- Boutons de cotes 1X2 -->
+      <div class="grid grid-cols-3 gap-2 mt-4 text-center text-xs font-mono">
+        <button id="btn-m1-1" onclick="togglePick('Arsenal vs City', 'Victoire Arsenal (1)', 1.45, 'btn-m1-1')" class="bg-slate-950 active:scale-95 transition p-2.5 rounded-xl border border-slate-800 flex flex-col items-center">
+          <span class="text-[10px] text-slate-400">1</span>
+          <span class="font-bold text-white">1.45</span>
+        </button>
+        <button id="btn-m1-x" onclick="togglePick('Arsenal vs City', 'Match Nul (X)', 3.80, 'btn-m1-x')" class="bg-slate-950 active:scale-95 transition p-2.5 rounded-xl border border-slate-800 flex flex-col items-center">
+          <span class="text-[10px] text-slate-400">X</span>
+          <span class="font-bold text-white">3.80</span>
+        </button>
+        <button id="btn-m1-2" onclick="togglePick('Arsenal vs City', 'Victoire City (2)', 6.50, 'btn-m1-2')" class="bg-slate-950 active:scale-95 transition p-2.5 rounded-xl border border-slate-800 flex flex-col items-center">
+          <span class="text-[10px] text-slate-400">2</span>
+          <span class="font-bold text-white">6.50</span>
+        </button>
       </div>
     </div>
 
-    <!-- Match 2 : CAF / RDC -->
+    <!-- Match 2 (Afrique / RDC) -->
     <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-lg">
       <div class="flex justify-between text-[11px] text-slate-400 mb-2">
-        <span>CAF Champions League</span>
-        <span class="text-[#00E676] font-mono">15:30</span>
+        <span class="font-semibold text-slate-300">CAF Champions League</span>
+        <span class="text-[#00E676] font-mono font-bold">15:30 (Kinshasa)</span>
       </div>
-      <div class="flex justify-between items-center font-bold text-base">
+      
+      <div class="flex justify-between items-center font-bold text-base my-1">
         <span>TP Mazembe</span>
-        <span class="text-xs text-slate-500">VS</span>
-        <span>Sundowns</span>
+        <span class="text-xs text-slate-500 font-mono">VS</span>
+        <span>Mamelodi Sundowns</span>
       </div>
-      <div class="grid grid-cols-3 gap-2 mt-3 text-center text-xs font-mono">
-        <button onclick="ajouterMatch()" class="bg-slate-950 p-2 rounded-lg border border-slate-800">1 : <b class="text-[#00E676]">2.10</b></button>
-        <button onclick="ajouterMatch()" class="bg-slate-950 p-2 rounded-lg border border-slate-800">X : 3.05</button>
-        <button onclick="ajouterMatch()" class="bg-slate-950 p-2 rounded-lg border border-slate-800">2 : <b class="text-sky-400">3.40</b></button>
+
+      <!-- Cotes -->
+      <div class="grid grid-cols-3 gap-2 mt-4 text-center text-xs font-mono">
+        <button id="btn-m2-1" onclick="togglePick('TP Mazembe vs Sundowns', 'Victoire Mazembe (1)', 2.10, 'btn-m2-1')" class="bg-slate-950 active:scale-95 transition p-2.5 rounded-xl border border-slate-800 flex flex-col items-center">
+          <span class="text-[10px] text-slate-400">1</span>
+          <span class="font-bold text-white">2.10</span>
+        </button>
+        <button id="btn-m2-x" onclick="togglePick('TP Mazembe vs Sundowns', 'Match Nul (X)', 3.05, 'btn-m2-x')" class="bg-slate-950 active:scale-95 transition p-2.5 rounded-xl border border-slate-800 flex flex-col items-center">
+          <span class="text-[10px] text-slate-400">X</span>
+          <span class="font-bold text-white">3.05</span>
+        </button>
+        <button id="btn-m2-2" onclick="togglePick('TP Mazembe vs Sundowns', 'Victoire Sundowns (2)', 3.40, 'btn-m2-2')" class="bg-slate-950 active:scale-95 transition p-2.5 rounded-xl border border-slate-800 flex flex-col items-center">
+          <span class="text-[10px] text-slate-400">2</span>
+          <span class="font-bold text-white">3.40</span>
+        </button>
       </div>
+    </div>
+
+  </main>
+
+  <!-- ================= ÉCRAN 2 : PRONOSTICS VIP ================= -->
+  <main id="screen-predictions" class="screen p-4 space-y-4">
+    <h2 class="text-xs font-bold text-slate-400 font-mono uppercase tracking-wider">Analyses & Pronostics Certifiés</h2>
+    
+    <!-- Pronostic Gratuit -->
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4">
+      <div class="flex justify-between items-center text-[10px] font-mono mb-2">
+        <span class="text-[#00E676] bg-emerald-500/10 px-2 py-0.5 rounded font-bold">PRONO GRATUIT</span>
+        <span class="text-slate-400">Confiance : 85%</span>
+      </div>
+      <h3 class="font-bold text-sm">Arsenal vs Man. City</h3>
+      <p class="text-xs text-slate-300 mt-1">Sélection : <b class="text-[#00E676]">Plus de 2.5 Buts</b></p>
+      <div class="mt-3 flex justify-between items-center pt-2 border-t border-slate-800 text-xs">
+        <span class="text-slate-400 font-mono">Cote : 1.88</span>
+        <button id="btn-p1" onclick="togglePick('Arsenal vs City', 'Plus de 2.5 Buts', 1.88, 'btn-p1')" class="bg-[#00E676] text-[#0B0F19] px-3 py-1 rounded-lg font-bold">
+          + Ajouter
+        </button>
+      </div>
+    </div>
+
+    <!-- Pronostic VIP Exclusif -->
+    <div class="bg-gradient-to-r from-slate-900 to-indigo-950 border border-indigo-500/30 rounded-2xl p-4">
+      <div class="flex justify-between items-center text-[10px] font-mono mb-2">
+        <span class="text-indigo-400 bg-indigo-500/20 px-2 py-0.5 rounded font-bold">★ EXCLUSIF VIP</span>
+        <span class="text-indigo-300 font-bold">ROI Moyen +115%</span>
+      </div>
+      <h3 class="font-bold text-sm">Real Madrid vs Dortmund</h3>
+      <p class="text-xs text-slate-300 mt-1">Analyse des 5 derniers face-à-face et forme xG à domicile.</p>
+      <div class="mt-4 pt-3 border-t border-indigo-500/20 flex justify-between items-center">
+        <span class="text-xs font-mono text-slate-400">Cote : 2.05</span>
+        <button onclick="openPaymentModal()" class="bg-indigo-600 active:scale-95 transition text-white px-3 py-1.5 rounded-lg text-xs font-bold">
+          Débloquer ce prono
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <!-- ================= ÉCRAN 3 : COUPON COMBINÉ ================= -->
+  <main id="screen-coupon" class="screen p-4 space-y-4">
+    <div class="flex justify-between items-center">
+      <h2 class="text-xs font-bold text-slate-400 font-mono uppercase tracking-wider">Mon Coupon</h2>
+      <button onclick="clearCoupon()" class="text-xs text-red-400 font-mono">Vider tout</button>
+    </div>
+
+    <!-- Liste des sélections -->
+    <div id="couponList" class="space-y-2">
+      <!-- Rempli en JavaScript -->
+    </div>
+
+    <!-- Calculatrice de cote -->
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-3 font-mono text-xs">
+      <div class="flex justify-between text-slate-400">
+        <span>Cote totale combinée :</span>
+        <b id="totalOddsDisplay" class="text-white text-sm text-[#00E676]">1.00</b>
+      </div>
+      <div class="flex justify-between text-slate-400">
+        <span>Indice de risque :</span>
+        <b id="riskDisplay" class="text-slate-300">Faible</b>
+      </div>
+      <div class="pt-3 border-t border-slate-800 flex justify-between items-center">
+        <span class="text-slate-300">Mise (USD) :</span>
+        <input type="number" id="stakeInput" value="10" oninput="recalc()" class="w-16 bg-slate-950 border border-slate-800 text-center py-1 rounded-lg text-white font-bold">
+      </div>
+      <div class="flex justify-between text-slate-200 pt-1 font-bold">
+        <span>Gains potentiels :</span>
+        <span id="potentialGainDisplay" class="text-[#00E676] text-base">0.00 $</span>
+      </div>
+    </div>
+
+    <button onclick="shareCoupon()" class="w-full bg-[#00E676] active:scale-95 transition text-[#0B0F19] font-black py-3 rounded-xl text-xs uppercase tracking-wider shadow-lg shadow-emerald-500/20">
+      Partager ce coupon (Code #SA-98)
+    </button>
+  </main>
+
+  <!-- ================= ÉCRAN 4 : MON COMPTE & PAIEMENT ================= -->
+  <main id="screen-account" class="screen p-4 space-y-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 text-center">
+      <div class="w-14 h-14 bg-emerald-500/10 border border-[#00E676] rounded-full mx-auto flex items-center justify-center text-xl font-bold text-[#00E676] mb-3">
+        VIP
+      </div>
+      <h3 class="font-bold text-base">Espace Membre Sport Analytics</h3>
+      <p id="accountStatusText" class="text-xs text-slate-400 font-mono mt-1">Statut actuel : Compte Gratuit</p>
+    </div>
+
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-3">
+      <h4 class="font-bold text-sm text-[#00E676]">Activer l'Abonnement VIP RDC</h4>
+      <p class="text-xs text-slate-300">Accédez à 100% des pronostics IA certifiés et aux cotes à fort ROI.</p>
+      
+      <div class="grid grid-cols-2 gap-2 pt-2">
+        <div onclick="openPaymentModal(2, '1 Semaine')" class="cursor-pointer bg-slate-950 border border-slate-800 p-3 rounded-xl text-center active:border-[#00E676]">
+          <span class="text-[10px] text-slate-400 block font-mono">1 SEMAINE</span>
+          <b class="text-sm text-white">2.00 $</b>
+        </div>
+        <div onclick="openPaymentModal(5, '1 Mois')" class="cursor-pointer bg-slate-950 border border-emerald-500/40 p-3 rounded-xl text-center active:border-[#00E676]">
+          <span class="text-[10px] text-[#00E676] block font-mono">1 MOIS (Top)</span>
+          <b class="text-sm text-white">5.00 $</b>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ================= FENÊTRE POPUP MOBILE MONEY ================= -->
+  <div id="paymentModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-end sm:items-center justify-center z-50 p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 w-full max-w-sm space-y-4">
+      <div class="flex justify-between items-center pb-2 border-b border-slate-800">
+        <h3 class="font-bold text-sm text-white">Paiement Mobile Money RDC</h3>
+        <button onclick="closePaymentModal()" class="text-slate-400 font-mono text-base font-bold">✕</button>
+      </div>
+
+      <div class="text-xs text-slate-300">
+        Forfait : <b id="modalPlanName" class="text-[#00E676]">1 Semaine VIP (2.00 $)</b>
+      </div>
+
+      <!-- Choix opérateur -->
+      <div>
+        <label class="block text-[10px] font-mono text-slate-400 mb-1.5 uppercase">1. Choisissez votre réseau :</label>
+        <div class="grid grid-cols-3 gap-2 text-center text-xs font-bold font-mono">
+          <button type="button" onclick="selectOperator(this, 'M-Pesa')" class="op-btn bg-slate-950 border-2 border-red-500/80 text-white p-2.5 rounded-xl">M-Pesa</button>
+          <button type="button" onclick="selectOperator(this, 'Orange')" class="op-btn bg-slate-950 border-2 border-slate-800 text-slate-300 p-2.5 rounded-xl">Orange</button>
+          <button type="button" onclick="selectOperator(this, 'Airtel')" class="op-btn bg-slate-950 border-2 border-slate-800 text-slate-300 p-2.5 rounded-xl">Airtel</button>
+        </div>
+      </div>
+
+      <!-- Numéro de téléphone -->
+      <div>
+        <label class="block text-[10px] font-mono text-slate-400 mb-1.5 uppercase">2. Votre Numéro RDC :</label>
+        <input type="tel" id="userPhone" placeholder="Ex: 0812345678" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white font-mono focus:outline-none focus:border-[#00E676]">
+      </div>
+
+      <!-- Bouton payer -->
+      <button id="paySubmitBtn" onclick="processPayment()" class="w-full bg-[#00E676] active:scale-95 transition text-[#0B0F19] font-black py-3 rounded-xl text-xs uppercase tracking-wider">
+        Valider et Recevoir le PIN
+      </button>
     </div>
   </div>
 
-  <!-- Barre tactile du bas (Navigation Android) -->
-  <nav class="fixed bottom-0 left-0 right-0 bg-slate-950 border-t border-slate-800 py-3 px-6 flex justify-between text-xs z-50">
-    <button class="text-[#00E676] font-bold">⚽ Matchs</button>
-    <button class="text-slate-400">📈 Pronos</button>
-    <button class="text-slate-400">🎫 Coupon (<span id="count">2</span>)</button>
-    <button class="text-slate-400">👤 Compte</button>
+  <!-- ================= BARRE DU BAS (NAVIGATION MOBILE) ================= -->
+  <nav class="fixed bottom-0 left-0 right-0 bg-[#0B0F19]/95 backdrop-blur-lg border-t border-slate-800 py-2.5 px-6 flex justify-between items-center z-40">
+    <button onclick="nav('matches')" id="nav-matches" class="nav-btn flex flex-col items-center text-[#00E676]">
+      <span class="text-base">⚽</span>
+      <span class="text-[10px] font-bold mt-0.5">Matchs</span>
+    </button>
+    <button onclick="nav('predictions')" id="nav-predictions" class="nav-btn flex flex-col items-center text-slate-400">
+      <span class="text-base">📈</span>
+      <span class="text-[10px] font-bold mt-0.5">Pronos</span>
+    </button>
+    <button onclick="nav('coupon')" id="nav-coupon" class="nav-btn flex flex-col items-center text-slate-400 relative">
+      <span id="couponBadge" class="absolute -top-1 -right-2 bg-[#00E676] text-[#0B0F19] text-[9px] font-extrabold w-4 h-4 rounded-full flex items-center justify-center">0</span>
+      <span class="text-base">🎫</span>
+      <span class="text-[10px] font-bold mt-0.5">Coupon</span>
+    </button>
+    <button onclick="nav('account')" id="nav-account" class="nav-btn flex flex-col items-center text-slate-400">
+      <span class="text-base">👤</span>
+      <span class="text-[10px] font-bold mt-0.5">Compte</span>
+    </button>
   </nav>
 
+  <!-- ================= JAVASCRIPT COMPLET & FIABLE ================= -->
   <script>
-    let c = 2;
-    function ajouterMatch() {
-      c++;
-      document.getElementById('count').innerText = c;
-      alert('Match ajouté au coupon combiné ! Total : ' + c);
+    // 1. Navigation entre onglets
+    function nav(screenId) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.querySelectorAll('.nav-btn').forEach(b => {
+        b.classList.remove('text-[#00E676]');
+        b.classList.add('text-slate-400');
+      });
+
+      document.getElementById('screen-' + screenId).classList.add('active');
+      const activeNav = document.getElementById('nav-' + screenId);
+      if (activeNav) {
+        activeNav.classList.remove('text-slate-400');
+        activeNav.classList.add('text-[#00E676]');
+      }
     }
+
+    // 2. Gestion Toast
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.innerText = msg;
+      t.classList.remove('-translate-y-20');
+      t.classList.add('translate-y-0');
+      setTimeout(() => {
+        t.classList.remove('translate-y-0');
+        t.classList.add('-translate-y-20');
+      }, 2500);
+    }
+
+    // 3. Gestion du coupon
+    let coupon = [];
+
+    function togglePick(match, pick, odd, btnId) {
+      const btn = document.getElementById(btnId);
+      const index = coupon.findIndex(c => c.match === match);
+
+      if (index > -1 && coupon[index].pick === pick) {
+        coupon.splice(index, 1);
+        if (btn) btn.classList.remove('border-[#00E676]', 'bg-[#00E676]/20');
+        showToast('Sélection retirée');
+      } else {
+        if (index > -1) coupon.splice(index, 1);
+        coupon.push({ match, pick, odd });
+        if (btn) btn.classList.add('border-[#00E676]', 'bg-[#00E676]/20');
+        showToast('Ajouté : ' + pick + ' (@' + odd + ')');
+      }
+
+      updateCouponUI();
+    }
+
+    function updateCouponUI() {
+      document.getElementById('couponBadge').innerText = coupon.length;
+      const list = document.getElementById('couponList');
+      list.innerHTML = '';
+
+      if (coupon.length === 0) {
+        list.innerHTML = '<div class="text-center py-8 text-xs text-slate-500 font-mono">Aucun match sélectionné.<br>Touchez une cote dans les matchs pour composer un coupon.</div>';
+      } else {
+        coupon.forEach((item, idx) => {
+          list.innerHTML += `
+            <div class="bg-slate-900 border border-slate-800 p-3 rounded-xl flex justify-between items-center text-xs">
+              <div>
+                <p class="font-bold text-white">${item.match}</p>
+                <p class="text-[#00E676] text-[11px]">${item.pick}</p>
+              </div>
+              <div class="flex items-center space-x-2">
+                <span class="font-mono font-bold bg-slate-950 px-2 py-1 rounded text-white border border-slate-800">${item.odd.toFixed(2)}</span>
+                <button onclick="removeCouponItem(${idx})" class="text-red-400 font-bold px-1">✕</button>
+              </div>
+            </div>
+          `;
+        });
+      }
+
+      recalc();
+    }
+
+    function removeCouponItem(index) {
+      coupon.splice(index, 1);
+      updateCouponUI();
+    }
+
+    function clearCoupon() {
+      coupon = [];
+      updateCouponUI();
+      showToast('Coupon vidé');
+    }
+
+    function recalc() {
+      const totalOdds = coupon.reduce((acc, i) => acc * i.odd, 1.0);
+      const stake = parseFloat(document.getElementById('stakeInput').value) || 0;
+      const gain = (coupon.length > 0 ? totalOdds * stake : 0).toFixed(2);
+
+      document.getElementById('totalOddsDisplay').innerText = coupon.length > 0 ? totalOdds.toFixed(2) : '1.00';
+      document.getElementById('potentialGainDisplay').innerText = gain + ' $';
+
+      const risk = document.getElementById('riskDisplay');
+      if (totalOdds > 5) risk.innerText = 'Élevé';
+      else if (totalOdds > 2.5) risk.innerText = 'Modéré';
+      else risk.innerText = 'Faible';
+    }
+
+    function shareCoupon() {
+      if (coupon.length === 0) return showToast('Ajoutez des matchs d abord !');
+      showToast('Code #SA-98 copié ! Partagez-le avec vos amis.');
+    }
+
+    // 4. Gestion Paiement Mobile Money RDC
+    let selectedOp = 'M-Pesa';
+
+    function openPaymentModal(price = 2, name = '1 Semaine VIP') {
+      document.getElementById('modalPlanName').innerText = `${name} (${price}.00 $)`;
+      const modal = document.getElementById('paymentModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closePaymentModal() {
+      const modal = document.getElementById('paymentModal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    function selectOperator(btn, op) {
+      selectedOp = op;
+      document.querySelectorAll('.op-btn').forEach(b => {
+        b.classList.remove('border-red-500/80', 'border-orange-500/80', 'border-red-600', 'text-white');
+        b.classList.add('border-slate-800', 'text-slate-300');
+      });
+      btn.classList.add('border-red-500/80', 'text-white');
+    }
+
+    function processPayment() {
+      const phone = document.getElementById('userPhone').value.trim();
+      if (!phone || phone.length < 9) {
+        return alert('Veuillez entrer un numéro de téléphone RDC valide (ex: 0812345678)');
+      }
+
+      const btn = document.getElementById('paySubmitBtn');
+      btn.innerText = 'Connexion à ' + selectedOp + '...';
+      btn.disabled = true;
+
+      setTimeout(() => {
+        btn.innerText = 'Demande PIN envoyée sur ' + phone;
+      }, 1000);
+
+      setTimeout(() => {
+        closePaymentModal();
+        btn.innerText = 'Valider et Recevoir le PIN';
+        btn.disabled = false;
+        
+        // Activation VIP
+        document.getElementById('vipBadgeHeader').innerText = '★ VIP ACTIF';
+        document.getElementById('vipBadgeHeader').classList.add('bg-[#00E676]', 'text-[#0B0F19]');
+        document.getElementById('accountStatusText').innerText = 'Statut : VIP ACTIF jusqu au 30/11 via ' + selectedOp;
+        
+        showToast('Paiement validé ! Votre forfait VIP est activé.');
+      }, 3000);
+    }
+
+    // Initialisation
+    updateCouponUI();
   </script>
 </body>
 </html>
