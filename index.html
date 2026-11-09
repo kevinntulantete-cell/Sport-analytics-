@@ -19,140 +19,80 @@
   <header class="sticky top-0 bg-[#0B0F19]/95 backdrop-blur-md p-4 border-b border-slate-800 flex justify-between items-center z-50">
     <div>
       <h1 class="text-lg font-black tracking-wider text-white">SPORT<span class="text-[#00E676]">ANALYTICS</span></h1>
-      <p class="text-[9px] text-slate-400 font-mono">IA & PREDICTIONS SPORTIVES</p>
+      <p class="text-[9px] text-slate-400 font-mono">DONNÉES EN DIRECT & PRÉDICTIONS</p>
     </div>
     <button onclick="nav('account')" id="vipBadgeHeader" class="text-[10px] bg-emerald-500/20 text-[#00E676] border border-emerald-500/40 px-2.5 py-1 rounded-lg font-bold font-mono">
       ★ DEVENIR VIP
     </button>
   </header>
 
-  <!-- Notification Flottante Toast -->
+  <!-- Notification Toast -->
   <div id="toast" class="fixed top-16 left-4 right-4 bg-[#00E676] text-[#0B0F19] text-xs font-bold py-2.5 px-4 rounded-xl shadow-xl text-center transform -translate-y-20 transition-all duration-300 z-50">
     Notification
   </div>
 
-  <!-- ================= ÉCRAN 1 : MATCHS DU JOUR ================= -->
+  <!-- ================= ÉCRAN 1 : MATCHS (DIRECT, AUJOURD'HUI, À VENIR, TERMINÉS) ================= -->
   <main id="screen-matches" class="screen active p-4 space-y-4">
     
-    <!-- Bannière Mobile Money -->
-    <div onclick="openPaymentModal()" class="cursor-pointer bg-gradient-to-r from-slate-900 to-emerald-950 p-3.5 rounded-2xl border border-emerald-500/30 flex justify-between items-center">
-      <div>
-        <p class="text-[11px] font-bold text-[#00E676]">Paiement Mobile Money RDC</p>
-        <p class="text-[10px] text-slate-300">Activez votre accès VIP avec M-Pesa, Orange ou Airtel.</p>
-      </div>
-      <span class="bg-[#00E676] text-[#0B0F19] text-[10px] font-bold px-2 py-1 rounded-lg">Payer</span>
+    <!-- Filtres des Matchs (Sous-menu dynamique) -->
+    <div class="flex space-x-1.5 overflow-x-auto pb-1 scrollbar-none font-mono text-xs">
+      <button onclick="filterMatches('LIVE')" id="tab-LIVE" class="match-filter-btn shrink-0 bg-[#00E676] text-[#0B0F19] px-3 py-1.5 rounded-lg font-bold flex items-center space-x-1.5">
+        <span class="w-1.5 h-1.5 rounded-full bg-red-600 animate-ping"></span>
+        <span>En Direct (<span id="count-live">2</span>)</span>
+      </button>
+      <button onclick="filterMatches('TODAY')" id="tab-TODAY" class="match-filter-btn shrink-0 bg-slate-900 border border-slate-800 text-slate-300 px-3 py-1.5 rounded-lg font-semibold">
+        Aujourd'hui (<span id="count-today">3</span>)
+      </button>
+      <button onclick="filterMatches('UPCOMING')" id="tab-UPCOMING" class="match-filter-btn shrink-0 bg-slate-900 border border-slate-800 text-slate-300 px-3 py-1.5 rounded-lg font-semibold">
+        À Venir (<span id="count-upcoming">2</span>)
+      </button>
+      <button onclick="filterMatches('FINISHED')" id="tab-FINISHED" class="match-filter-btn shrink-0 bg-slate-900 border border-slate-800 text-slate-300 px-3 py-1.5 rounded-lg font-semibold">
+        Terminés (<span id="count-finished">2</span>)
+      </button>
     </div>
 
-    <h2 class="text-xs font-bold text-slate-400 font-mono uppercase tracking-wider">Matchs & Direct en cours</h2>
-
-    <!-- Match 1 -->
-    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-lg">
-      <div class="flex justify-between text-[11px] text-slate-400 mb-2">
-        <span class="font-semibold text-slate-300">UEFA Champions League</span>
-        <span class="text-red-400 font-bold flex items-center"><span class="w-2 h-2 rounded-full bg-red-500 animate-ping mr-1"></span> 68' DIRECT</span>
-      </div>
-      
-      <div class="flex justify-between items-center font-bold text-base my-1">
-        <span>Arsenal FC</span>
-        <span class="text-[#00E676] font-mono text-xl">2 - 1</span>
-        <span>Man. City</span>
-      </div>
-
-      <!-- Jauge de probabilité -->
-      <div class="mt-3 pt-3 border-t border-slate-800">
-        <div class="flex justify-between text-[10px] font-mono text-slate-400 mb-1">
-          <span class="text-[#00E676]">Arsenal: 62%</span>
-          <span>Nul: 24%</span>
-          <span class="text-sky-400">City: 14%</span>
-        </div>
-        <div class="w-full h-1.5 bg-slate-950 rounded-full flex overflow-hidden">
-          <div style="width: 62%" class="bg-[#00E676]"></div>
-          <div style="width: 24%" class="bg-slate-600"></div>
-          <div style="width: 14%" class="bg-sky-400"></div>
-        </div>
-      </div>
-
-      <!-- Boutons de cotes 1X2 -->
-      <div class="grid grid-cols-3 gap-2 mt-4 text-center text-xs font-mono">
-        <button id="btn-m1-1" onclick="togglePick('Arsenal vs City', 'Victoire Arsenal (1)', 1.45, 'btn-m1-1')" class="bg-slate-950 active:scale-95 transition p-2.5 rounded-xl border border-slate-800 flex flex-col items-center">
-          <span class="text-[10px] text-slate-400">1</span>
-          <span class="font-bold text-white">1.45</span>
-        </button>
-        <button id="btn-m1-x" onclick="togglePick('Arsenal vs City', 'Match Nul (X)', 3.80, 'btn-m1-x')" class="bg-slate-950 active:scale-95 transition p-2.5 rounded-xl border border-slate-800 flex flex-col items-center">
-          <span class="text-[10px] text-slate-400">X</span>
-          <span class="font-bold text-white">3.80</span>
-        </button>
-        <button id="btn-m1-2" onclick="togglePick('Arsenal vs City', 'Victoire City (2)', 6.50, 'btn-m1-2')" class="bg-slate-950 active:scale-95 transition p-2.5 rounded-xl border border-slate-800 flex flex-col items-center">
-          <span class="text-[10px] text-slate-400">2</span>
-          <span class="font-bold text-white">6.50</span>
-        </button>
-      </div>
+    <!-- Conteneur des cartes de matchs générées en JavaScript -->
+    <div id="matchesContainer" class="space-y-3">
+      <!-- Rempli automatiquement -->
     </div>
-
-    <!-- Match 2 (Afrique / RDC) -->
-    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-lg">
-      <div class="flex justify-between text-[11px] text-slate-400 mb-2">
-        <span class="font-semibold text-slate-300">CAF Champions League</span>
-        <span class="text-[#00E676] font-mono font-bold">15:30 (Kinshasa)</span>
-      </div>
-      
-      <div class="flex justify-between items-center font-bold text-base my-1">
-        <span>TP Mazembe</span>
-        <span class="text-xs text-slate-500 font-mono">VS</span>
-        <span>Mamelodi Sundowns</span>
-      </div>
-
-      <!-- Cotes -->
-      <div class="grid grid-cols-3 gap-2 mt-4 text-center text-xs font-mono">
-        <button id="btn-m2-1" onclick="togglePick('TP Mazembe vs Sundowns', 'Victoire Mazembe (1)', 2.10, 'btn-m2-1')" class="bg-slate-950 active:scale-95 transition p-2.5 rounded-xl border border-slate-800 flex flex-col items-center">
-          <span class="text-[10px] text-slate-400">1</span>
-          <span class="font-bold text-white">2.10</span>
-        </button>
-        <button id="btn-m2-x" onclick="togglePick('TP Mazembe vs Sundowns', 'Match Nul (X)', 3.05, 'btn-m2-x')" class="bg-slate-950 active:scale-95 transition p-2.5 rounded-xl border border-slate-800 flex flex-col items-center">
-          <span class="text-[10px] text-slate-400">X</span>
-          <span class="font-bold text-white">3.05</span>
-        </button>
-        <button id="btn-m2-2" onclick="togglePick('TP Mazembe vs Sundowns', 'Victoire Sundowns (2)', 3.40, 'btn-m2-2')" class="bg-slate-950 active:scale-95 transition p-2.5 rounded-xl border border-slate-800 flex flex-col items-center">
-          <span class="text-[10px] text-slate-400">2</span>
-          <span class="font-bold text-white">3.40</span>
-        </button>
-      </div>
-    </div>
-
   </main>
 
-  <!-- ================= ÉCRAN 2 : PRONOSTICS VIP ================= -->
+  <!-- ================= ÉCRAN 2 : PRONOSTICS CERTIFIÉS ================= -->
   <main id="screen-predictions" class="screen p-4 space-y-4">
-    <h2 class="text-xs font-bold text-slate-400 font-mono uppercase tracking-wider">Analyses & Pronostics Certifiés</h2>
-    
-    <!-- Pronostic Gratuit -->
-    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4">
+    <div class="flex justify-between items-center">
+      <h2 class="text-xs font-bold text-slate-400 font-mono uppercase tracking-wider">Pronostics & Taux de Réussite</h2>
+      <span class="text-[10px] font-mono bg-emerald-500/10 text-[#00E676] px-2 py-0.5 rounded font-bold">78.5% Réussite</span>
+    </div>
+
+    <!-- Pronostic 1 : Gratuit -->
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-lg">
       <div class="flex justify-between items-center text-[10px] font-mono mb-2">
-        <span class="text-[#00E676] bg-emerald-500/10 px-2 py-0.5 rounded font-bold">PRONO GRATUIT</span>
-        <span class="text-slate-400">Confiance : 85%</span>
+        <span class="text-[#00E676] bg-emerald-500/10 px-2 py-0.5 rounded font-bold">PRONO GRATUIT DU JOUR</span>
+        <span class="text-slate-400">Indice : 88%</span>
       </div>
-      <h3 class="font-bold text-sm">Arsenal vs Man. City</h3>
-      <p class="text-xs text-slate-300 mt-1">Sélection : <b class="text-[#00E676]">Plus de 2.5 Buts</b></p>
+      <h3 class="font-bold text-sm">TP Mazembe vs Mamelodi Sundowns</h3>
+      <p class="text-xs text-slate-300 mt-1">Sélection : <b class="text-[#00E676]">Moins de 2.5 Buts</b></p>
+      <p class="text-[11px] text-slate-400 mt-0.5">Mazembe concède moins de 0.4 but par match à domicile en phase CAF.</p>
       <div class="mt-3 flex justify-between items-center pt-2 border-t border-slate-800 text-xs">
-        <span class="text-slate-400 font-mono">Cote : 1.88</span>
-        <button id="btn-p1" onclick="togglePick('Arsenal vs City', 'Plus de 2.5 Buts', 1.88, 'btn-p1')" class="bg-[#00E676] text-[#0B0F19] px-3 py-1 rounded-lg font-bold">
-          + Ajouter
+        <span class="text-slate-400 font-mono">Cote : 1.75</span>
+        <button onclick="addCustomPick('TP Mazembe vs Sundowns', 'Moins de 2.5 Buts', 1.75)" class="bg-[#00E676] text-[#0B0F19] px-3 py-1.5 rounded-lg font-bold">
+          + Ajouter au coupon
         </button>
       </div>
     </div>
 
-    <!-- Pronostic VIP Exclusif -->
-    <div class="bg-gradient-to-r from-slate-900 to-indigo-950 border border-indigo-500/30 rounded-2xl p-4">
+    <!-- Pronostic 2 : VIP Lock -->
+    <div class="bg-gradient-to-r from-slate-900 to-indigo-950 border border-indigo-500/30 rounded-2xl p-4 shadow-lg">
       <div class="flex justify-between items-center text-[10px] font-mono mb-2">
-        <span class="text-indigo-400 bg-indigo-500/20 px-2 py-0.5 rounded font-bold">★ EXCLUSIF VIP</span>
-        <span class="text-indigo-300 font-bold">ROI Moyen +115%</span>
+        <span class="text-indigo-400 bg-indigo-500/20 px-2 py-0.5 rounded font-bold">★ PRONO VIP CONFIDENTIEL</span>
+        <span class="text-indigo-300 font-bold">Cote Combinée : 3.40</span>
       </div>
-      <h3 class="font-bold text-sm">Real Madrid vs Dortmund</h3>
-      <p class="text-xs text-slate-300 mt-1">Analyse des 5 derniers face-à-face et forme xG à domicile.</p>
+      <h3 class="font-bold text-sm">Real Madrid vs Manchester City</h3>
+      <p class="text-xs text-slate-300 mt-1">Analyse complète xG et absences clés verrouillées.</p>
       <div class="mt-4 pt-3 border-t border-indigo-500/20 flex justify-between items-center">
-        <span class="text-xs font-mono text-slate-400">Cote : 2.05</span>
-        <button onclick="openPaymentModal()" class="bg-indigo-600 active:scale-95 transition text-white px-3 py-1.5 rounded-lg text-xs font-bold">
-          Débloquer ce prono
+        <span class="text-xs font-mono text-slate-400">Réservé Membres VIP</span>
+        <button onclick="openPaymentModal(2, '1 Semaine VIP')" class="bg-indigo-600 active:scale-95 transition text-white px-3 py-1.5 rounded-lg text-xs font-bold">
+          Débloquer via Mobile Money
         </button>
       </div>
     </div>
@@ -162,22 +102,18 @@
   <main id="screen-coupon" class="screen p-4 space-y-4">
     <div class="flex justify-between items-center">
       <h2 class="text-xs font-bold text-slate-400 font-mono uppercase tracking-wider">Mon Coupon</h2>
-      <button onclick="clearCoupon()" class="text-xs text-red-400 font-mono">Vider tout</button>
+      <button onclick="clearCoupon()" class="text-xs text-red-400 font-mono">Vider</button>
     </div>
 
-    <!-- Liste des sélections -->
-    <div id="couponList" class="space-y-2">
-      <!-- Rempli en JavaScript -->
-    </div>
+    <div id="couponList" class="space-y-2"></div>
 
-    <!-- Calculatrice de cote -->
     <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-3 font-mono text-xs">
       <div class="flex justify-between text-slate-400">
         <span>Cote totale combinée :</span>
         <b id="totalOddsDisplay" class="text-white text-sm text-[#00E676]">1.00</b>
       </div>
       <div class="flex justify-between text-slate-400">
-        <span>Indice de risque :</span>
+        <span>Niveau de risque :</span>
         <b id="riskDisplay" class="text-slate-300">Faible</b>
       </div>
       <div class="pt-3 border-t border-slate-800 flex justify-between items-center">
@@ -191,52 +127,51 @@
     </div>
 
     <button onclick="shareCoupon()" class="w-full bg-[#00E676] active:scale-95 transition text-[#0B0F19] font-black py-3 rounded-xl text-xs uppercase tracking-wider shadow-lg shadow-emerald-500/20">
-      Partager ce coupon (Code #SA-98)
+      Partager le coupon (#SA-2026)
     </button>
   </main>
 
-  <!-- ================= ÉCRAN 4 : MON COMPTE & PAIEMENT ================= -->
+  <!-- ================= ÉCRAN 4 : MON COMPTE ================= -->
   <main id="screen-account" class="screen p-4 space-y-4">
     <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 text-center">
       <div class="w-14 h-14 bg-emerald-500/10 border border-[#00E676] rounded-full mx-auto flex items-center justify-center text-xl font-bold text-[#00E676] mb-3">
-        VIP
+        SA
       </div>
-      <h3 class="font-bold text-base">Espace Membre Sport Analytics</h3>
-      <p id="accountStatusText" class="text-xs text-slate-400 font-mono mt-1">Statut actuel : Compte Gratuit</p>
+      <h3 class="font-bold text-base">Sport Analytics RDC</h3>
+      <p id="accountStatusText" class="text-xs text-slate-400 font-mono mt-1">Statut : Compte Standard</p>
     </div>
 
     <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-3">
-      <h4 class="font-bold text-sm text-[#00E676]">Activer l'Abonnement VIP RDC</h4>
-      <p class="text-xs text-slate-300">Accédez à 100% des pronostics IA certifiés et aux cotes à fort ROI.</p>
+      <h4 class="font-bold text-sm text-[#00E676]">Abonnement Mobile Money RDC</h4>
+      <p class="text-xs text-slate-300">Activez instantanément avec Vodacom M-Pesa, Orange Money ou Airtel Money.</p>
       
-      <div class="grid grid-cols-2 gap-2 pt-2">
-        <div onclick="openPaymentModal(2, '1 Semaine')" class="cursor-pointer bg-slate-950 border border-slate-800 p-3 rounded-xl text-center active:border-[#00E676]">
-          <span class="text-[10px] text-slate-400 block font-mono">1 SEMAINE</span>
+      <div class="grid grid-cols-2 gap-2 pt-2 font-mono">
+        <div onclick="openPaymentModal(2, '1 Semaine VIP')" class="cursor-pointer bg-slate-950 border border-slate-800 p-3 rounded-xl text-center active:border-[#00E676]">
+          <span class="text-[10px] text-slate-400 block">1 SEMAINE</span>
           <b class="text-sm text-white">2.00 $</b>
         </div>
-        <div onclick="openPaymentModal(5, '1 Mois')" class="cursor-pointer bg-slate-950 border border-emerald-500/40 p-3 rounded-xl text-center active:border-[#00E676]">
-          <span class="text-[10px] text-[#00E676] block font-mono">1 MOIS (Top)</span>
+        <div onclick="openPaymentModal(5, '1 Mois VIP')" class="cursor-pointer bg-slate-950 border border-emerald-500/40 p-3 rounded-xl text-center active:border-[#00E676]">
+          <span class="text-[10px] text-[#00E676] block">1 MOIS (PROMO)</span>
           <b class="text-sm text-white">5.00 $</b>
         </div>
       </div>
     </div>
   </main>
 
-  <!-- ================= FENÊTRE POPUP MOBILE MONEY ================= -->
+  <!-- ================= POPUP MOBILE MONEY ================= -->
   <div id="paymentModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-end sm:items-center justify-center z-50 p-4">
     <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 w-full max-w-sm space-y-4">
       <div class="flex justify-between items-center pb-2 border-b border-slate-800">
-        <h3 class="font-bold text-sm text-white">Paiement Mobile Money RDC</h3>
+        <h3 class="font-bold text-sm text-white">Paiement Mobile Money</h3>
         <button onclick="closePaymentModal()" class="text-slate-400 font-mono text-base font-bold">✕</button>
       </div>
 
       <div class="text-xs text-slate-300">
-        Forfait : <b id="modalPlanName" class="text-[#00E676]">1 Semaine VIP (2.00 $)</b>
+        Forfait choisi : <b id="modalPlanName" class="text-[#00E676]">1 Semaine VIP (2.00 $)</b>
       </div>
 
-      <!-- Choix opérateur -->
       <div>
-        <label class="block text-[10px] font-mono text-slate-400 mb-1.5 uppercase">1. Choisissez votre réseau :</label>
+        <label class="block text-[10px] font-mono text-slate-400 mb-1.5 uppercase">Opérateur RDC :</label>
         <div class="grid grid-cols-3 gap-2 text-center text-xs font-bold font-mono">
           <button type="button" onclick="selectOperator(this, 'M-Pesa')" class="op-btn bg-slate-950 border-2 border-red-500/80 text-white p-2.5 rounded-xl">M-Pesa</button>
           <button type="button" onclick="selectOperator(this, 'Orange')" class="op-btn bg-slate-950 border-2 border-slate-800 text-slate-300 p-2.5 rounded-xl">Orange</button>
@@ -244,20 +179,18 @@
         </div>
       </div>
 
-      <!-- Numéro de téléphone -->
       <div>
-        <label class="block text-[10px] font-mono text-slate-400 mb-1.5 uppercase">2. Votre Numéro RDC :</label>
+        <label class="block text-[10px] font-mono text-slate-400 mb-1.5 uppercase">Numéro de téléphone :</label>
         <input type="tel" id="userPhone" placeholder="Ex: 0812345678" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white font-mono focus:outline-none focus:border-[#00E676]">
       </div>
 
-      <!-- Bouton payer -->
       <button id="paySubmitBtn" onclick="processPayment()" class="w-full bg-[#00E676] active:scale-95 transition text-[#0B0F19] font-black py-3 rounded-xl text-xs uppercase tracking-wider">
-        Valider et Recevoir le PIN
+        Recevoir le Push PIN
       </button>
     </div>
   </div>
 
-  <!-- ================= BARRE DU BAS (NAVIGATION MOBILE) ================= -->
+  <!-- ================= BARRE DE NAVIGATION INFÉRIEURE ================= -->
   <nav class="fixed bottom-0 left-0 right-0 bg-[#0B0F19]/95 backdrop-blur-lg border-t border-slate-800 py-2.5 px-6 flex justify-between items-center z-40">
     <button onclick="nav('matches')" id="nav-matches" class="nav-btn flex flex-col items-center text-[#00E676]">
       <span class="text-base">⚽</span>
@@ -278,9 +211,217 @@
     </button>
   </nav>
 
-  <!-- ================= JAVASCRIPT COMPLET & FIABLE ================= -->
+  <!-- ================= BASE DE DONNÉES ET GESTIONNAIRE D'ÉVÉNEMENTS ================= -->
   <script>
-    // 1. Navigation entre onglets
+    // 1. Catalogue des Matchs (Direct, Aujourd'hui, À Venir, Terminés)
+    const matchesData = [
+      // EN DIRECT
+      {
+        id: 1,
+        type: 'LIVE',
+        league: 'UEFA Champions League',
+        home: 'Arsenal FC',
+        away: 'Manchester City',
+        time: "74' DIRECT",
+        score: '2 - 1',
+        isLive: true,
+        p1: 65, pX: 22, p2: 13,
+        odds: { h: 1.40, x: 3.90, a: 6.80 }
+      },
+      {
+        id: 2,
+        type: 'LIVE',
+        league: 'Ligue 1 RDC - Linafoot',
+        home: 'AS Vita Club',
+        away: 'DCMP Imana (Kinshasa)',
+        time: "32' DIRECT",
+        score: '1 - 0',
+        isLive: true,
+        p1: 58, pX: 28, p2: 14,
+        odds: { h: 1.65, x: 3.10, a: 5.20 }
+      },
+      // AUJOURD'HUI
+      {
+        id: 3,
+        type: 'TODAY',
+        league: 'CAF Champions League',
+        home: 'TP Mazembe (Lubumbashi)',
+        away: 'Mamelodi Sundowns',
+        time: '15:30 (Heure Kinshasa)',
+        score: 'VS',
+        isLive: false,
+        p1: 52, pX: 28, p2: 20,
+        odds: { h: 2.10, x: 3.05, a: 3.40 }
+      },
+      {
+        id: 4,
+        type: 'TODAY',
+        league: 'Premier League',
+        home: 'Liverpool FC',
+        away: 'Chelsea FC',
+        time: '18:30 (Heure Kinshasa)',
+        score: 'VS',
+        isLive: false,
+        p1: 55, pX: 25, p2: 20,
+        odds: { h: 1.85, x: 3.60, a: 4.00 }
+      },
+      {
+        id: 5,
+        type: 'TODAY',
+        league: 'La Liga',
+        home: 'FC Barcelone',
+        away: 'Atletico Madrid',
+        time: '21:00 (Heure Kinshasa)',
+        score: 'VS',
+        isLive: false,
+        p1: 50, pX: 28, p2: 22,
+        odds: { h: 1.95, x: 3.45, a: 3.85 }
+      },
+      // À VENIR (CALENDRIER)
+      {
+        id: 6,
+        type: 'UPCOMING',
+        league: 'UEFA Champions League (Demain)',
+        home: 'Real Madrid',
+        away: 'Bayern Munich',
+        time: 'Demain 21:00',
+        score: 'VS',
+        isLive: false,
+        p1: 48, pX: 26, p2: 26,
+        odds: { h: 2.15, x: 3.50, a: 3.20 }
+      },
+      {
+        id: 7,
+        type: 'UPCOMING',
+        league: 'CAF Coupe de la Confédération',
+        home: 'FC Saint-Éloi Lupopo',
+        away: 'USM Alger',
+        time: 'Dimanche 15:30',
+        score: 'VS',
+        isLive: false,
+        p1: 45, pX: 30, p2: 25,
+        odds: { h: 2.30, x: 2.95, a: 3.10 }
+      },
+      // TERMINÉS (RÉSULTATS HIER)
+      {
+        id: 8,
+        type: 'FINISHED',
+        league: 'Serie A (Terminé)',
+        home: 'Inter Milan',
+        away: 'Juventus',
+        time: 'SCORE FINAL',
+        score: '2 - 0',
+        isLive: false,
+        resultBadge: 'PRONO GAGNÉ ✓',
+        odds: { h: 1.80, x: 3.30, a: 4.50 }
+      },
+      {
+        id: 9,
+        type: 'FINISHED',
+        league: 'Premier League (Terminé)',
+        home: 'Tottenham',
+        away: 'Aston Villa',
+        time: 'SCORE FINAL',
+        score: '1 - 2',
+        isLive: false,
+        resultBadge: 'PRONO GAGNÉ (+2.5) ✓',
+        odds: { h: 2.20, x: 3.40, a: 3.10 }
+      }
+    ];
+
+    let currentFilter = 'LIVE';
+
+    // Rendu dynamique des matchs
+    function renderMatches() {
+      const container = document.getElementById('matchesContainer');
+      container.innerHTML = '';
+
+      const filtered = matchesData.filter(m => m.type === currentFilter);
+
+      if (filtered.length === 0) {
+        container.innerHTML = '<div class="text-center py-10 text-slate-500 font-mono text-xs">Aucun match dans cette section pour le moment.</div>';
+        return;
+      }
+
+      filtered.forEach(m => {
+        const isFinished = m.type === 'FINISHED';
+        container.innerHTML += `
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-lg">
+            <div class="flex justify-between items-center text-[10px] text-slate-400 mb-2">
+              <span class="font-semibold text-slate-300 font-mono">${m.league}</span>
+              ${m.isLive ? 
+                `<span class="text-red-400 font-bold flex items-center"><span class="w-2 h-2 rounded-full bg-red-500 animate-ping mr-1"></span> ${m.time}</span>` :
+                (isFinished ? `<span class="text-[#00E676] font-bold bg-emerald-500/10 px-2 py-0.5 rounded">${m.resultBadge}</span>` : `<span class="text-slate-400 font-mono">${m.time}</span>`)
+              }
+            </div>
+
+            <div class="flex justify-between items-center font-bold text-base my-1">
+              <span class="truncate max-w-[40%]">${m.home}</span>
+              <span class="text-[#00E676] font-mono text-xl px-2">${m.score}</span>
+              <span class="truncate max-w-[40%] text-right">${m.away}</span>
+            </div>
+
+            ${!isFinished ? `
+              <div class="mt-3 pt-2.5 border-t border-slate-800">
+                <div class="flex justify-between text-[10px] font-mono text-slate-400 mb-1">
+                  <span class="text-[#00E676]">1: ${m.p1}%</span>
+                  <span>X: ${m.pX}%</span>
+                  <span class="text-sky-400">2: ${m.p2}%</span>
+                </div>
+                <div class="w-full h-1.5 bg-slate-950 rounded-full flex overflow-hidden">
+                  <div style="width: ${m.p1}%" class="bg-[#00E676]"></div>
+                  <div style="width: ${m.pX}%" class="bg-slate-600"></div>
+                  <div style="width: ${m.p2}%" class="bg-sky-400"></div>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-3 gap-2 mt-3 text-center text-xs font-mono">
+                <button onclick="togglePick('${m.home} vs ${m.away}', 'Victoire 1', ${m.odds.h})" class="bg-slate-950 active:scale-95 transition p-2 rounded-xl border border-slate-800">
+                  <span class="text-[9px] text-slate-500 block">1</span>
+                  <b class="text-white">${m.odds.h.toFixed(2)}</b>
+                </button>
+                <button onclick="togglePick('${m.home} vs ${m.away}', 'Match Nul (X)', ${m.odds.x})" class="bg-slate-950 active:scale-95 transition p-2 rounded-xl border border-slate-800">
+                  <span class="text-[9px] text-slate-500 block">X</span>
+                  <b class="text-white">${m.odds.x.toFixed(2)}</b>
+                </button>
+                <button onclick="togglePick('${m.home} vs ${m.away}', 'Victoire 2', ${m.odds.a})" class="bg-slate-950 active:scale-95 transition p-2 rounded-xl border border-slate-800">
+                  <span class="text-[9px] text-slate-500 block">2</span>
+                  <b class="text-white">${m.odds.a.toFixed(2)}</b>
+                </button>
+              </div>
+            ` : `
+              <div class="mt-2 text-right">
+                <span class="text-[10px] font-mono text-slate-500">Cote initiale validée : @${m.odds.h.toFixed(2)}</span>
+              </div>
+            `}
+          </div>
+        `;
+      });
+
+      // Mettre à jour les compteurs
+      document.getElementById('count-live').innerText = matchesData.filter(m => m.type === 'LIVE').length;
+      document.getElementById('count-today').innerText = matchesData.filter(m => m.type === 'TODAY').length;
+      document.getElementById('count-upcoming').innerText = matchesData.filter(m => m.type === 'UPCOMING').length;
+      document.getElementById('count-finished').innerText = matchesData.filter(m => m.type === 'FINISHED').length;
+    }
+
+    function filterMatches(type) {
+      currentFilter = type;
+      document.querySelectorAll('.match-filter-btn').forEach(btn => {
+        btn.classList.remove('bg-[#00E676]', 'text-[#0B0F19]', 'font-bold');
+        btn.classList.add('bg-slate-900', 'text-slate-300', 'font-semibold');
+      });
+
+      const activeBtn = document.getElementById('tab-' + type);
+      if (activeBtn) {
+        activeBtn.classList.remove('bg-slate-900', 'text-slate-300', 'font-semibold');
+        activeBtn.classList.add('bg-[#00E676]', 'text-[#0B0F19]', 'font-bold');
+      }
+
+      renderMatches();
+    }
+
+    // Gestion de la navigation entre onglets
     function nav(screenId) {
       document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
       document.querySelectorAll('.nav-btn').forEach(b => {
@@ -296,7 +437,7 @@
       }
     }
 
-    // 2. Gestion Toast
+    // Toast
     function showToast(msg) {
       const t = document.getElementById('toast');
       t.innerText = msg;
@@ -308,25 +449,24 @@
       }, 2500);
     }
 
-    // 3. Gestion du coupon
+    // Gestion du Coupon
     let coupon = [];
 
-    function togglePick(match, pick, odd, btnId) {
-      const btn = document.getElementById(btnId);
+    function togglePick(match, pick, odd) {
       const index = coupon.findIndex(c => c.match === match);
-
       if (index > -1 && coupon[index].pick === pick) {
         coupon.splice(index, 1);
-        if (btn) btn.classList.remove('border-[#00E676]', 'bg-[#00E676]/20');
         showToast('Sélection retirée');
       } else {
         if (index > -1) coupon.splice(index, 1);
         coupon.push({ match, pick, odd });
-        if (btn) btn.classList.add('border-[#00E676]', 'bg-[#00E676]/20');
         showToast('Ajouté : ' + pick + ' (@' + odd + ')');
       }
-
       updateCouponUI();
+    }
+
+    function addCustomPick(match, pick, odd) {
+      togglePick(match, pick, odd);
     }
 
     function updateCouponUI() {
@@ -335,7 +475,7 @@
       list.innerHTML = '';
 
       if (coupon.length === 0) {
-        list.innerHTML = '<div class="text-center py-8 text-xs text-slate-500 font-mono">Aucun match sélectionné.<br>Touchez une cote dans les matchs pour composer un coupon.</div>';
+        list.innerHTML = '<div class="text-center py-8 text-xs text-slate-500 font-mono">Aucun match sélectionné.<br>Touchez une cote pour composer votre combiné.</div>';
       } else {
         coupon.forEach((item, idx) => {
           list.innerHTML += `
@@ -352,12 +492,11 @@
           `;
         });
       }
-
       recalc();
     }
 
-    function removeCouponItem(index) {
-      coupon.splice(index, 1);
+    function removeCouponItem(idx) {
+      coupon.splice(idx, 1);
       updateCouponUI();
     }
 
@@ -383,10 +522,10 @@
 
     function shareCoupon() {
       if (coupon.length === 0) return showToast('Ajoutez des matchs d abord !');
-      showToast('Code #SA-98 copié ! Partagez-le avec vos amis.');
+      showToast('Code #SA-2026 copié ! Prêt à partager.');
     }
 
-    // 4. Gestion Paiement Mobile Money RDC
+    // Gestion Paiement Mobile Money RDC
     let selectedOp = 'M-Pesa';
 
     function openPaymentModal(price = 2, name = '1 Semaine VIP') {
@@ -422,24 +561,24 @@
       btn.disabled = true;
 
       setTimeout(() => {
-        btn.innerText = 'Demande PIN envoyée sur ' + phone;
-      }, 1000);
+        btn.innerText = 'PIN envoyé sur ' + phone;
+      }, 1200);
 
       setTimeout(() => {
         closePaymentModal();
-        btn.innerText = 'Valider et Recevoir le PIN';
+        btn.innerText = 'Recevoir le Push PIN';
         btn.disabled = false;
         
-        // Activation VIP
         document.getElementById('vipBadgeHeader').innerText = '★ VIP ACTIF';
         document.getElementById('vipBadgeHeader').classList.add('bg-[#00E676]', 'text-[#0B0F19]');
         document.getElementById('accountStatusText').innerText = 'Statut : VIP ACTIF jusqu au 30/11 via ' + selectedOp;
         
-        showToast('Paiement validé ! Votre forfait VIP est activé.');
-      }, 3000);
+        showToast('Paiement validé ! Vos pronostics VIP sont débloqués.');
+      }, 3200);
     }
 
-    // Initialisation
+    // Lancement au chargement
+    renderMatches();
     updateCouponUI();
   </script>
 </body>
